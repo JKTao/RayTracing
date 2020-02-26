@@ -5,6 +5,6 @@ find_package(Eigen3 REQUIRED)
 include_directories("${CMAKE_SOURCE_DIR}/include")
 include_directories(${EIGEN3_INCLUDE_DIRS})
 
-add_executable(RayTracing "${CMAKE_SOURCE_DIR}/src/main.cc")
+add_executable(RayTracing src/main.cc src/Ray.cc src/Object.cc src/Camera.cc src/Ultility.cc) 
 
 # target_link_libraries(testCode PRIVATE ${OpenCV_LIBRARIES}) 
