@@ -7,9 +7,14 @@ using Eigen::Vector3d;
 
 Object::Object(){}
 
+Object::Object(const Eigen::Vector3d  & emission, const Eigen::Vector3d & color, double reflect, double refract):emission(emission), color(color), reflect(reflect), refract(refract){
+
+}
+
 Sphere::Sphere(){}
 
-Sphere::Sphere(double radius, const Vector3d & center, const Eigen::Vector3d  & emission, const Eigen::Vector3d & color, double reflect):radius(radius), center(center), emission(emission), color(color), reflect(reflect){
+Sphere::Sphere(double radius, const Vector3d & center, const Eigen::Vector3d  & emission, const Eigen::Vector3d & color, double reflect, double refract):Object(emission, color, reflect, refract), radius(radius), center(center){
+    
 }
 
 std::optional<Intersection> Sphere::find_intersection(const Ray & ray){

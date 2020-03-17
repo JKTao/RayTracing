@@ -1,6 +1,7 @@
 #pragma once
 #include "Ray.hpp"
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 
 
 class Camera{

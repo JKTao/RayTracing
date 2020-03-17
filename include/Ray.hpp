@@ -16,10 +16,13 @@ public:
     Eigen::Vector3d normal;
     Eigen::Vector3d position;
     double t;
+    double n;
     int into;
-    double cos_theta;
+    double sin_alpha;
+    double cos_alpha;
+    double sin_theta;
     Intersection();
     Intersection(Object *object, const Eigen::Vector3d & position, const Eigen::Vector3d & normal, double t);
     Ray caculate_reflect_ray(const Ray & ray);
-    Ray caculate_refract_ray(const Ray & ray);
+    std::optional<Ray> caculate_refract_ray(const Ray & ray);
 };
