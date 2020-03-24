@@ -1,15 +1,24 @@
 #include "Camera.hpp"
 #include "cmath"
+#include <iostream>
 Camera::Camera(){
-
 }
 
-Camera::Camera(double fov, const Eigen::Vector3d & eye, const Eigen::Vector3d & front, const Eigen::Vector3d & right, int height, int width):fov(fov), eye(eye), front(front.normalized()), right(right.normalized()), height(height), width(width){
+Camera::Camera(double fov, const Eigen::Vector3d & eye, const Eigen::Vector3d & front, const Eigen::Vector3d & up, int height, int width):fov(fov), eye(eye), front(front.normalized()), up(up.normalized()), height(height), width(width){
     double tan_half_fov = tan(fov/2 * M_PI / 180);
-    scale = tan_half_fov / width * 2;
-    up = front.cross(right);
-    up.normalize();
-    initial_direction = front - right * scale * (width/2 - 0.5) + up * scale * (height/2 - 0.5);
+    // std::cout << "tan_half_fov = " << tan_half_fov << std::endl;
+    scale_x = tan_half_fov / width * 2;
+    scale_y = tan_half_fov / height * 2;
+    // std::cout << scale_y << std::endl;
+    this->right = front.cross(up).normalized();
+    this->up = right.cross(front).normalized();
+    std::cerr << "front" << front << std::endl;
+    std::cerr << "up" << this->up << std::endl;
+    std::cerr << "right" << this->right << std::endl;
+    this->right = this->right * scale_x;
+    this->up = this->up * scale_y;
+    initial_direction = front - this->right * (width/2 - 0.5) + this->up * (height/2 - 0.5); //direction to the left-up pixel.
+    //if found inverse image, change + up to - up
 }
 
 Ray Camera::generate_ray(int x, int y){

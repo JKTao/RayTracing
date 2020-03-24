@@ -1,6 +1,7 @@
 #include "Object.hpp"
 #include <cmath>
 #include <Eigen/Core>
+#include <iostream>
 
 
 using Eigen::Vector3d;
@@ -38,6 +39,7 @@ std::optional<Intersection> Sphere::find_intersection(const Ray & ray){
     }
     Eigen::Vector3d position = ray.direction * t + ray.origin;
     Eigen::Vector3d normal = (position - center).normalized();
+    // std::cout << "sphere " << normal[0] << " " << normal[1] << " " << normal[2] << std::endl;
     return Intersection(static_cast<Object*>(this), normal, position, t);
 }
 

@@ -1,5 +1,6 @@
 #include "Scene.hpp"
 #include <vector>
+#include <iostream>
 
 Scene::Scene(){
 
@@ -15,6 +16,8 @@ std::vector<Intersection> Scene::find_intersections(const Ray & ray){
         std::optional<Intersection> op_intersection = object->find_intersection(ray);
         if(op_intersection){
             intersections.push_back(*op_intersection);
+            auto it = *op_intersection;
+            std::cout << it.normal << std::endl;
         }
     }
     return intersections;

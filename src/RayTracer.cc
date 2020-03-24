@@ -2,6 +2,7 @@
 #include "Ray.hpp"
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 RayTracer::RayTracer(Scene * scene, Camera * camera):scene(scene), camera(camera){
 
@@ -9,13 +10,18 @@ RayTracer::RayTracer(Scene * scene, Camera * camera):scene(scene), camera(camera
 
 Eigen::Vector3d RayTracer::ray_tracing(const Ray & ray, int depth){
     std::vector<Intersection> intersections = scene->find_intersections(ray);
-    std::vector<Intersection>::iterator nearest_intersection;
+    std::vector<Intersection>::iterator nearest_intersection = intersections.end();
     if(!intersections.empty()){
         nearest_intersection = std::min_element(intersections.begin(), intersections.end(), [](const Intersection & A, const Intersection & B){return A.t < B.t;});
     }
     else{
-        return Eigen::Vector3d(1, 1, 1);
+        return Eigen::Vector3d(0, 0, 0);
     }
+    //for test
+    if(depth == 0){
+        return nearest_intersection->normal;
+    }
+    // std::cout << "test " << std::endl;
     if(depth > 5){
         return nearest_intersection->object->color;
     }

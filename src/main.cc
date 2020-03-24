@@ -5,25 +5,54 @@
 #include <iostream>
 #include <vector>
 #include <Eigen/Core>
+#include <opencv2/opencv.hpp>
 
-void write_colors(std::vector<std::vector<Eigen::Vector3d>> & colors){
-
-    
+cv::Vec3b convertToMat(Eigen::Vector3d pixel){
+    double RGB[3];
+    for(int i = 0; i < 3; i++){
+        RGB[i] = (pixel[i] + 1) * 128;
+    }
+    //BGR model
+    return cv::Vec3b(RGB[2], RGB[1], RGB[0]);
 }
+//TODO: Render the model normal and other model.
 int main(){
     using Vec = Eigen::Vector3d;
-    Sphere *light = new Sphere(600, Vec(50,681.6-0.27,81.6),Vec(12,12,12),  Vec(0, 0, 0), 1, 1);
-    Sphere *sphere = new Sphere(16.5,Vec(27,16.5,47),  Vec(0, 0, 0),Vec(1,1,1)*.999, 1, 1);
-    std::vector<Sphere*> objects = {light, sphere};
-    Scene *scene = new Scene(std::vector<Object*>(objects.begin(), objects.end()));
-    Camera *camera = new Camera();//TODO set camera parameter;
+    // Sphere *light = new Sphere(600, Vec(50,681.6-0.27,81.6),Vec(12,12,12),  Vec(0, 0, 0), 1, 1);
+    // Sphere *sphere = new Sphere(16.5,Vec(27,16.5,47),  Vec(0, 0, 0),Vec(1,1,1)*.999, 1, 1);
+    // std::vector<Sphere*> objects = {light, sphere};
+    // Scene *scene = new Scene(std::vector<Object*>(objects.begin(), objects.end()));
+    // Camera *camera = new Camera(28.8, Vec(50, 52, 295.6), Vec(0, -0.042612, -1), Vec(1, 0, 0), 768, 1024);//TODO set camera parameter;
+    // RayTracer *raytracer = new RayTracer(scene, camera);
+    // cv::Mat image(768, 1024, CV_8UC3);
+    // Vec pixel;
+    // for(int i = 0; i < camera->height; i++){
+    //     for(int j = 0; j < camera->width; j++){
+    //         pixel = raytracer->ray_tracing(camera->generate_ray(j, i), 0);
+    //         std::cout << pixel[0] << " " <<  pixel[1] << " " << pixel[2] << std::endl;
+    //         image.at<cv::Vec3b>(i, j) = convertToMat(pixel);
+    //     }
+    // }
+    Sphere *sphere = new Sphere(10, Vec(0, 10, -10), Vec(0, 0, 0), Vec(1, 1, 1), 1, 1);
+    std::vector<Object*> objects = {(Object*)sphere};
+    Scene *scene = new Scene(objects);
+    Camera *camera = new Camera(90, Vec(0, 10, 10), Vec(0, 0, -1), Vec(0, 1, 0), 800, 800);
     RayTracer *raytracer = new RayTracer(scene, camera);
-    std::vector<std::vector<Eigen::Vector3d>> colors(camera->height);
+    cv::Mat image(800, 800, CV_8UC3, cv::Vec3b(0, 0, 0));
+    Vec pixel;
     for(int i = 0; i < camera->height; i++){
         for(int j = 0; j < camera->width; j++){
-            colors[i].emplace_back(raytracer->ray_tracing(camera->generate_ray(j, i), 0));
+            pixel = raytracer->ray_tracing(camera->generate_ray(j, i), 0);
+            image.at<cv::Vec3b>(i, j) = convertToMat(pixel);
         }
     }
-    write_colors(colors);
-    
+    // for(int i = 0; i < camera->height; i++){
+    //     for(int j = 0; j < camera->width; j++){
+    //         image.at<cv::Vec3b>(i, j) = cv::Vec3b(0, i * 255.0/camera->width, j * 255.0/camera->height);
+    //         std::cout << image.at<cv::Vec3b>(i, j) << std::endl;
+    //     }
+    // }
+
+    cv::imwrite("./test.png", image);
+    return 0;
 }
