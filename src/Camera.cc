@@ -12,9 +12,9 @@ Camera::Camera(double fov, const Eigen::Vector3d & eye, const Eigen::Vector3d & 
     // std::cout << scale_y << std::endl;
     this->right = front.cross(up).normalized();
     this->up = right.cross(front).normalized();
-    std::cerr << "front" << front << std::endl;
-    std::cerr << "up" << this->up << std::endl;
-    std::cerr << "right" << this->right << std::endl;
+    // std::cerr << "front" << front << std::endl;
+    // std::cerr << "up" << this->up << std::endl;
+    // std::cerr << "right" << this->right << std::endl;
     this->right = this->right * scale_x;
     this->up = this->up * scale_y;
     initial_direction = front - this->right * (width/2 - 0.5) + this->up * (height/2 - 0.5); //direction to the left-up pixel.
