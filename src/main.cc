@@ -2,6 +2,7 @@
 #include "Object.hpp"
 #include "RayTracer.hpp"
 #include "Scene.hpp"
+#include "Model.hpp"
 #include <iostream>
 #include <vector>
 #include <Eigen/Core>
@@ -33,9 +34,10 @@ int main(){
     //         image.at<cv::Vec3b>(i, j) = convertToMat(pixel);
     //     }
     // }
-    Sphere *sphere = new Sphere(10, Vec(0, 10, -10), Vec(0, 0, 0), Vec(1, 1, 1), 1, 1);
-    std::vector<Object*> objects = {(Object*)sphere};
-    Scene *scene = new Scene(objects);
+    Model *model = new Model();
+    model->read_material_lib("../models/diningroom/diningroom.mtl");
+    model->read_object_file("../models/diningroom/diningroom.obj");
+    Scene *scene = new Scene(model->triangles);
     Camera *camera = new Camera(90, Vec(0, 10, 10), Vec(0, 0, -1), Vec(0, 1, 0), 800, 800);
     RayTracer *raytracer = new RayTracer(scene, camera);
     cv::Mat image(800, 800, CV_8UC3, cv::Vec3b(0, 0, 0));

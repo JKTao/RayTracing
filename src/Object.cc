@@ -1,46 +1,84 @@
-#include "Object.hpp"
-#include <cmath>
-#include <Eigen/Core>
-#include <iostream>
+#include <Object.hpp>
+#include <Model.hpp>
 
-
-using Eigen::Vector3d;
-
-Object::Object(){}
-
-Object::Object(const Eigen::Vector3d  & emission, const Eigen::Vector3d & color, double reflect, double refract):emission(emission), color(color), reflect(reflect), refract(refract){
-
+using namespace std;
+Object::Object(){
 }
 
-Sphere::Sphere(){}
-
-Sphere::Sphere(double radius, const Vector3d & center, const Eigen::Vector3d  & emission, const Eigen::Vector3d & color, double reflect, double refract):Object(emission, color, reflect, refract), radius(radius), center(center){
-    
+Object::Object(Material *mtl):mtl(mtl){
 }
 
-std::optional<Intersection> Sphere::find_intersection(const Ray & ray){
-    Vector3d p = ray.origin - center;
-    double A = ray.direction.squaredNorm();
-    double B = p.dot(ray.direction);
-    double C = p.squaredNorm() - radius * radius;
-    double determinator = B * B - A * C;
-    double t;
-    if(determinator <= 0){
-        return std::nullopt;
-    }else{
-        double sqrt_determinator = sqrt(determinator);
-        t = (-B - sqrt_determinator) / A;
-        if(t < 0){
-            t = (-B + sqrt_determinator) / A;
-            if(t < 0){
-                return std::nullopt;
-            }
+Triangle::Triangle(){
+}
+
+Triangle::Triangle(Eigen::Vector3d &v1, Eigen::Vector3d &v2, Eigen::Vector3d &v3, Eigen::Vector3d & vn1, Eigen::Vector3d &vn2, Eigen::Vector3d &vn3, Material *mtl):Object(mtl){
+    vertices << v1, v2, v3;
+    normals << vn1, vn2, vn3;
+    edges.col(1) = vertices.col(1) - vertices.col(0);
+    edges.col(2) = vertices.col(2) - vertices.col(0);
+    Eigen::Vector3d first_node = vertices.rowwise().minCoeff();
+    Eigen::Vector3d second_node = vertices.rowwise().maxCoeff();
+    boundingbox = AABB(first_node, second_node);
+    //rows
+}
+
+AABB Triangle::get_boundingbox(){
+    return boundingbox;
+}
+
+bool Triangle::find_intersection(const Ray & ray, Intersection &intersection){
+    // https://huangwang.github.io/2019/06/04/%E6%B1%82%E8%A7%A3%E5%B0%84%E7%BA%BF%E4%B8%8E%E4%B8%89%E8%A7%92%E5%BD%A2%E4%BA%A4%E7%82%B9%E7%9A%84%E7%AE%97%E6%B3%95/
+    //find_intersection
+    Eigen::Vector3d T = ray.origin - vertices.col(0);
+    Eigen::Vector3d P = ray.direction.cross(edges.col(2));
+    Eigen::Vector3d Q = T.cross(edges.col(1));
+    double b = P.dot(edges.col(1));
+    if(b > 1e-7 || b < -1e-7){
+        double b_inv = 1/b;
+        double t = Q.dot(edges.col(2)) * b_inv;
+        if(t < 0 || t > intersection.t){
+            return false;
         }
+        double u = P.dot(T) * b_inv;
+        double v = Q.dot(ray.direction) * b_inv;
+        if(0 < u && u < 1 && 0 < v && v < 1){
+            double w = 1 - u - v;
+            Eigen::Vector3d normal = normals.col(0) * w + normals.col(1) * u + normals.col(2) * v;
+            Eigen::Vector3d position = ray.direction * t + ray.origin;
+            intersection = move(Intersection(this, normal, position, t));
+            return true;
+        }
+        return false;
     }
-    Eigen::Vector3d position = ray.direction * t + ray.origin;
-    Eigen::Vector3d normal = (position - center).normalized();
-    // std::cout << "sphere " << normal[0] << " " << normal[1] << " " << normal[2] << std::endl;
-    return Intersection(static_cast<Object*>(this), normal, position, t);
+    return false;
 }
 
+AABB::AABB(){
 
+}
+
+AABB::AABB(Eigen::Vector3d & first_node, Eigen::Vector3d & second_node):first_node(move(first_node)), second_node(move(second_node)){
+    center_node = (this->first_node + this->second_node) * 0.5;
+
+}
+
+AABB AABB::get_boundingbox(){
+}
+
+bool AABB::find_intersection(const Ray & ray, Intersection &intersection){
+    // bouding box intersection!
+    Eigen::Matrix<double, 3, 2> t;
+    t.col(0) = (first_node - ray.origin).cwiseProduct(ray.inv_direction);
+    t.col(1) = (second_node - ray.origin).cwiseProduct(ray.inv_direction);
+    Eigen::Vector3d t1 = t.rowwise().minCoeff();
+    Eigen::Vector3d t2 = t.rowwise().maxCoeff();
+    double t_near = t1.maxCoeff();
+    double t_far = t2.minCoeff();
+    return (t_near < t_far && t_near < 1e10 && t_far > 1e-7);
+}
+
+AABB AABB::union_boundingbox(AABB & boundingbox1, AABB & boundingbox2){
+    Eigen::Vector3d first_node = boundingbox1.first_node.cwiseMin(boundingbox2.first_node);
+    Eigen::Vector3d second_node = boundingbox1.second_node.cwiseMax(boundingbox2.second_node);
+    return AABB(first_node, second_node);
+}

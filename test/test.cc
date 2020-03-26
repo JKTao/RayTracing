@@ -8,9 +8,10 @@ int main(){
     TicToc timer;
     Model model;
 
-    model.read_material_lib("../models/cbox/cbox.mtl");
+    model.read_material_lib("../models/diningroom/diningroom.mtl");
     cerr << timer.toc() << "ms" << endl;
-    model.read_object_file("../models/cbox/cbox.obj");
+    model.read_object_file("../models/diningroom/diningroom.obj");
     cerr << timer.toc() << "ms" << endl;
+    cerr << model.triangles.size() << endl;
     return 0;
 }

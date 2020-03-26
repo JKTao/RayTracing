@@ -5,18 +5,17 @@
 
 using Eigen::Vector3d;
 Ray::Ray(){
-
 }
 
 Ray::Ray(const Vector3d &origin, const Vector3d & direction):origin(origin), direction(direction){
+    inv_direction = direction.cwiseInverse();
+}
+
+Intersection::Intersection():t(1e10){
 
 }
 
-Intersection::Intersection(){
-
-}
-
-Intersection::Intersection(Object *object, const Eigen::Vector3d & normal, const Eigen::Vector3d & position, double t):object(object), normal(normal), position(position), t(t){
+Intersection::Intersection(Triangle *object, const Eigen::Vector3d & normal, const Eigen::Vector3d & position, double t):object(object), normal(normal), position(position), t(t){
     std::cout << "intersection " << normal[0] << normal[1] << normal[2] << std::endl;
 }
 
