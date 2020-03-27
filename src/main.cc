@@ -23,7 +23,7 @@ cv::Vec3b convertToMat(Eigen::Vector3d pixel){
 using namespace std;
 using Vec = Eigen::Vector3d;
 int main(){
-    string config_file_path = "../config/diningroom.yaml";
+    string config_file_path = "../config/veach_mis.yaml";
     Model *model = new Model(config_file_path);
     // cout << model->fov << " " << model->height << " " << model->width << " " << endl;
     // cout << model->triangles.size() << " " << endl;
