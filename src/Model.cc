@@ -3,6 +3,7 @@
 #include <Object.hpp>
 #include <iostream>
 #include <cstdio>
+#include <yaml-cpp/yaml.h>
 
 using namespace std;
 bool starts_with(char *str, const char *pattern){
@@ -14,6 +15,34 @@ bool starts_with(char *str, const char *pattern){
 }
 
 
+void read_config_vector(YAML::Node config, string key, Eigen::Vector3d & vector){
+    YAML::Node node = config[key];
+    for(int i = 0; i < node.size(); i++){
+        vector[i] = node[i].as<double>();
+    }
+}
+
+Model::Model(){
+}
+
+Model::Model(string config_file_path){
+    read_config(config_file_path.c_str());
+    read_material_lib(this->material_lib_path.c_str());
+    read_object_file(this->object_file_path.c_str());
+}
+
+void Model::read_config(const char *config_file_path){
+    YAML::Node config = YAML::LoadFile(config_file_path);
+    object_file_path = config["object_file_path"].as<string>();
+    material_lib_path = config["material_lib_path"].as<string>();
+    fov = config["fov"].as<double>();
+    width = config["width"].as<int>();
+    height = config["height"].as<int>();
+    read_config_vector(config, "position", this->eye);
+    read_config_vector(config, "lookat", this->lookat);
+    read_config_vector(config, "up", this->up);
+    front = lookat - eye;
+}
 
 void Model::read_object_file(const char *object_file_path){
     char buffer[200];
@@ -68,7 +97,7 @@ void Model::read_object_file(const char *object_file_path){
                 sscanf(buffer + 1, "%d %d %d %d %d %d", &v1, &vn1, &v2, &vn2, &v3, &vn3);
                 Triangle *triangle = new Triangle(vertices[v1 - 1], vertices[v2 - 1], vertices[v3 - 1], normals[vn1 - 1], normals[vn2 - 1], normals[vn3 - 1], mtl);
                 triangles.push_back(triangle);
-                // printf("%d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3);
+                printf("%d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3);
             }else if(number == 4){
                 // break the quadrilateral into triangles
                 sscanf(buffer + 1, "%d %d %d %d %d %d %d %d", &v1, &vn1, &v2, &vn2, &v3, &vn3, &v4, &vn4);
@@ -76,7 +105,7 @@ void Model::read_object_file(const char *object_file_path){
                 Triangle *triangle2 = new Triangle(vertices[v1 - 1], vertices[v3 - 1], vertices[v4 - 1], normals[vn1 - 1], normals[vn3 - 1], normals[vn4 - 1], mtl);
                 triangles.push_back(triangle1);
                 triangles.push_back(triangle2);
-                // printf("%d %d %d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3, v4, vn4);
+                printf("%d %d %d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3, v4, vn4);
             }
             // deal with face
         }

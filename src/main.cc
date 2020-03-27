@@ -4,48 +4,43 @@
 #include "Scene.hpp"
 #include "Model.hpp"
 #include <iostream>
+#include <string>
 #include <vector>
 #include <Eigen/Core>
-#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
 
 cv::Vec3b convertToMat(Eigen::Vector3d pixel){
     double RGB[3];
     for(int i = 0; i < 3; i++){
-        RGB[i] = (pixel[i] + 1) * 128;
+        pixel[i] = (pixel[i] > 1)?1:pixel[i];
+        RGB[i] = (pixel[i] + 1.00) * 127;
     }
-    //BGR model
+    //BGR
     return cv::Vec3b(RGB[2], RGB[1], RGB[0]);
 }
-//TODO: Render the model normal and other model.
+
+using namespace std;
+using Vec = Eigen::Vector3d;
 int main(){
-    using Vec = Eigen::Vector3d;
-    // Sphere *light = new Sphere(600, Vec(50,681.6-0.27,81.6),Vec(12,12,12),  Vec(0, 0, 0), 1, 1);
-    // Sphere *sphere = new Sphere(16.5,Vec(27,16.5,47),  Vec(0, 0, 0),Vec(1,1,1)*.999, 1, 1);
-    // std::vector<Sphere*> objects = {light, sphere};
-    // Scene *scene = new Scene(std::vector<Object*>(objects.begin(), objects.end()));
-    // Camera *camera = new Camera(28.8, Vec(50, 52, 295.6), Vec(0, -0.042612, -1), Vec(1, 0, 0), 768, 1024);//TODO set camera parameter;
-    // RayTracer *raytracer = new RayTracer(scene, camera);
-    // cv::Mat image(768, 1024, CV_8UC3);
-    // Vec pixel;
-    // for(int i = 0; i < camera->height; i++){
-    //     for(int j = 0; j < camera->width; j++){
-    //         pixel = raytracer->ray_tracing(camera->generate_ray(j, i), 0);
-    //         std::cout << pixel[0] << " " <<  pixel[1] << " " << pixel[2] << std::endl;
-    //         image.at<cv::Vec3b>(i, j) = convertToMat(pixel);
-    //     }
-    // }
-    Model *model = new Model();
-    model->read_material_lib("../models/diningroom/diningroom.mtl");
-    model->read_object_file("../models/diningroom/diningroom.obj");
+    string config_file_path = "../config/diningroom.yaml";
+    Model *model = new Model(config_file_path);
+    // cout << model->fov << " " << model->height << " " << model->width << " " << endl;
+    // cout << model->triangles.size() << " " << endl;
+    cout << model->up[0] << " "  << model->up[1] << " " << model->up[2] << endl;
+    cout << model->front[0] << " "  << model->front[1] << " " << model->front[2] << endl;
     Scene *scene = new Scene(model->triangles);
-    Camera *camera = new Camera(90, Vec(0, 10, 10), Vec(0, 0, -1), Vec(0, 1, 0), 800, 800);
+    Camera *camera = new Camera(model->fov, model->eye, model->front, model->up, model->height, model->width);
     RayTracer *raytracer = new RayTracer(scene, camera);
-    cv::Mat image(800, 800, CV_8UC3, cv::Vec3b(0, 0, 0));
+    cv::Mat image(model->height, model->width, CV_8UC3, cv::Vec3b(0, 0, 0));
     Vec pixel;
     for(int i = 0; i < camera->height; i++){
         for(int j = 0; j < camera->width; j++){
             pixel = raytracer->ray_tracing(camera->generate_ray(j, i), 0);
             image.at<cv::Vec3b>(i, j) = convertToMat(pixel);
+            cv::Vec3b pixel_ = image.at<cv::Vec3b>(i, j);
+            double x_ = pixel[0], y_ = pixel[1], z_ = pixel[2];
+            cout << i << " " << j << " " << x_ << " " << y_ << " " << z_ << endl;
         }
     }
     // for(int i = 0; i < camera->height; i++){

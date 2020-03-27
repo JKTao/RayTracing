@@ -3,27 +3,26 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+using namespace std;
 
 RayTracer::RayTracer(Scene * scene, Camera * camera):scene(scene), camera(camera){
 
 }
 
 Eigen::Vector3d RayTracer::ray_tracing(const Ray & ray, int depth){
-    std::vector<Intersection> intersections = scene->find_intersections(ray);
-    std::vector<Intersection>::iterator nearest_intersection = intersections.end();
-    if(!intersections.empty()){
-        nearest_intersection = std::min_element(intersections.begin(), intersections.end(), [](const Intersection & A, const Intersection & B){return A.t < B.t;});
+    Intersection intersection;
+    if(!scene->find_intersection(ray, intersection)){
+        return Eigen::Vector3d(1, 1, 1);
     }
-    else{
-        return Eigen::Vector3d(0, 0, 0);
-    }
+    // cout << "yes, once succedd" << endl;
     //for test
     if(depth == 0){
-        return nearest_intersection->normal;
+        return intersection.normal;
+
     }
     // std::cout << "test " << std::endl;
     if(depth > 5){
-        return nearest_intersection->object->mtl->Ka;
+        return intersection.object->mtl->Ka;
     }
     // auto reflect_ray = nearest_intersection->caculate_reflect_ray(ray);
     // auto refract_ray = nearest_intersection->caculate_refract_ray(ray);//reflect ray may return null is refract angle > 90.
@@ -44,6 +43,3 @@ Eigen::Vector3d RayTracer::ray_tracing(const Ray & ray, int depth){
 }
 
 // useless in this model.
-Eigen::Vector3d mix_color(Eigen::Vector3d & main_color, Eigen::Vector3d emission_color, Eigen::Vector3d & reflect_color, Eigen::Vector3d & refract_color){
-    return main_color;
-}

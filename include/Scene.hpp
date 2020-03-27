@@ -1,12 +1,14 @@
 #pragma once
 #include "Ray.hpp"
-#include "Model.hpp"
+#include "Object.hpp"
+#include "KdTree.hpp"
 #include <vector>
 
 class Scene{
 public:
-    std::vector<Triangle*> objects;
+    std::vector<Object*> objects;
+    Object *kdtree;
     Scene();
-    Scene(std::vector<Triangle*> & objects);
-    std::vector<Intersection> find_intersections(const Ray & ray);
+    Scene(std::vector<Object*> & objects);
+    bool find_intersection(const Ray & ray, Intersection & intersection);
 };

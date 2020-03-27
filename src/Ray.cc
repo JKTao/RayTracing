@@ -16,7 +16,7 @@ Intersection::Intersection():t(1e10){
 }
 
 Intersection::Intersection(Triangle *object, const Eigen::Vector3d & normal, const Eigen::Vector3d & position, double t):object(object), normal(normal), position(position), t(t){
-    std::cout << "intersection " << normal[0] << normal[1] << normal[2] << std::endl;
+    // std::cout << "intersection " << normal[0] << normal[1] << normal[2] << std::endl;
 }
 
 Ray Intersection::caculate_reflect_ray(const Ray & ray){

@@ -1,4 +1,5 @@
-#include "Model.hpp"
+#include "Object.hpp"
+#include "KdTree.hpp"
 #include "Scene.hpp"
 #include <vector>
 #include <iostream>
@@ -6,17 +7,10 @@
 Scene::Scene(){
 }
 
-Scene::Scene(std::vector<Triangle*> & objects):objects(std::move(objects)){
+Scene::Scene(std::vector<Object*> & objects):objects(objects.begin(), objects.end()){
+    kdtree = KdTree::build_kdtree(objects);
 }
 
-std::vector<Intersection> Scene::find_intersections(const Ray & ray){
-    std::vector<Intersection> intersections;
-    for(auto & object:objects){
-        Intersection intersection;
-        bool intersected = object->find_intersection(ray, intersection);
-        if(intersected){
-            intersections.push_back(intersection);
-        }
-    }
-    return intersections;
+bool Scene::find_intersection(const Ray & ray, Intersection & intersection){
+    return kdtree->find_intersection(ray, intersection);
 }

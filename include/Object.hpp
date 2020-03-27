@@ -20,8 +20,10 @@ struct Material{
 class Object{
 public:
     Material *mtl;
+    Eigen::Vector3d center;
     Object();
     Object(Material *mtl);
+    double get_center(int index);
     virtual bool find_intersection(const Ray & ray, Intersection & intersection) = 0;
     virtual ~Object() = default;
     virtual AABB get_boundingbox() = 0;
