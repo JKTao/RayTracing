@@ -22,13 +22,13 @@ cv::Vec3b convertToMat(Eigen::Vector3d pixel){
 
 using namespace std;
 using Vec = Eigen::Vector3d;
-int main(){
-    string config_file_path = "../config/veach_mis.yaml";
+int main(int argc, char *argv[]){
+    string config_file_path = "../config/cbox.yaml";
+    if(argc == 2){
+        config_file_path =  move(string(config_file_path));
+    }
+
     Model *model = new Model(config_file_path);
-    // cout << model->fov << " " << model->height << " " << model->width << " " << endl;
-    // cout << model->triangles.size() << " " << endl;
-    cout << model->up[0] << " "  << model->up[1] << " " << model->up[2] << endl;
-    cout << model->front[0] << " "  << model->front[1] << " " << model->front[2] << endl;
     Scene *scene = new Scene(model->triangles);
     Camera *camera = new Camera(model->fov, model->eye, model->front, model->up, model->height, model->width);
     RayTracer *raytracer = new RayTracer(scene, camera);
