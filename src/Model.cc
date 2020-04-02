@@ -102,17 +102,17 @@ void Model::read_object_file(const char *object_file_path){
                 sscanf(buffer + 1, "%d %d %d %d %d %d", &v1, &vn1, &v2, &vn2, &v3, &vn3);
                 Triangle *triangle = new Triangle(vertices[v1 - 1], vertices[v2 - 1], vertices[v3 - 1], normals[vn1 - 1], normals[vn2 - 1], normals[vn3 - 1], mtl);
                 triangles.push_back(triangle);
-                if(line_count > 14030){
-                    printf("%d %d %d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3, v4, vn4);
-                }
+                // if(line_count > 14030){
+                    // printf("%d %d %d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3, v4, vn4);
+                // }
                 // printf("%d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3);
             }else if(number == 4){
                 // break the quadrilateral into triangles
               
                 sscanf(buffer + 1, "%d %d %d %d %d %d %d %d", &v1, &vn1, &v2, &vn2, &v3, &vn3, &v4, &vn4);
-                if(line_count > 13990){
-                    printf("%d %d %d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3, v4, vn4);
-                }
+                // if(line_count > 13990){
+                //     printf("%d %d %d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3, v4, vn4);
+                // }
                 Triangle *triangle1 = new Triangle(vertices[v1 - 1], vertices[v2 - 1], vertices[v3 - 1], normals[vn1 - 1], normals[vn2 - 1], normals[vn3 - 1], mtl);
                 Triangle *triangle2 = new Triangle(vertices[v1 - 1], vertices[v3 - 1], vertices[v4 - 1], normals[vn1 - 1], normals[vn3 - 1], normals[vn4 - 1], mtl);
                 triangles.push_back(triangle1);
@@ -122,7 +122,7 @@ void Model::read_object_file(const char *object_file_path){
             // deal with face
         }
     }
-    cout << "LINE COUNT " << line_count << endl;
+    // cout << "LINE COUNT " << line_count << endl;
 }
 
 void Model::read_material_lib(const char *material_lib_path){
