@@ -53,9 +53,11 @@
 ![diningroom](./images/diningroom.png)
 
 - veach_mis模型(10万次采样)
+
 ![mis](./images/mis.png)
 
 - room模型(1万次采样)
+
 ![room](./images/room.png)
 
 ## 部分实现细节
