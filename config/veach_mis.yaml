@@ -1,0 +1,11 @@
+object_file_path: "../models/veach_mis/mis.obj"
+material_lib_path: "../models/veach_mis/mis.mtl"
+save_image_path: "../images/mis.png"
+max_depth: 0
+max_iteration: 3000
+position: [0, 2, 15]
+lookat: [0, -2, 2.5]
+up: [0, 1, 0]
+fov: 28
+width: 768
+height: 512

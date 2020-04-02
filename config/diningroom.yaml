@@ -1,0 +1,11 @@
+object_file_path: "../models/diningroom/diningroom.obj"
+material_lib_path: "../models/diningroom/diningroom.mtl"
+save_image_path: "../images/diningroom.png"
+max_depth: 5
+max_iteration: 3000
+position: [-0.5, 3, 5.5]
+lookat: [-0.5, 2, 0]
+up: [0, 1, 0]
+fov: 34.8
+width: 1280
+height: 720

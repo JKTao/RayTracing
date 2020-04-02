@@ -1,0 +1,11 @@
+object_file_path: "../models/cbox/cbox.obj"
+material_lib_path: "../models/cbox/cbox.mtl"
+save_image_path: "../images/cbox.png"
+max_depth: 5
+max_iteration: 10000
+position: [278, 273, -800]
+lookat: [278, 273, -799]
+up: [0, 1, 0]
+fov: 39.3077
+width: 512
+height: 512

@@ -2,6 +2,3 @@ build/
 .vscode/
 .idea/
 cmake-build-debug/
-models/
-images/
-config/
