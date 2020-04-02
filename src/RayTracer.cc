@@ -78,7 +78,7 @@ Ray RayTracer::next_ray_sample(Ray & ray, Intersection & intersection){
         cos_alpha = -cos_alpha;
     }
     reflect_direction = ray.caculate_reflect_direction(normal, cos_alpha);
-    if(object->mtl->Ni > 1){
+    if(object->mtl->Ni > 1 && (object->mtl->diffuse == 0 || random_generator.double_rand() < 0.5)){
         double res_cos_alpha = 1 - cos_alpha;
         double R0 = (n1 - n2)/(n1 + n2);
         R0 = R0 * R0;

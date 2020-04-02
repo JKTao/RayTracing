@@ -171,13 +171,13 @@ void Model::read_material_lib(const char *material_lib_path){
         }else if(Ka_norm > 0){
             mtl->material_type = mtl->LIGHT;
         }
-        if(Ks_norm == 0){
-            mtl->diffuse = 1;
+        if(Kd_norm == 0){
+            mtl->diffuse = 0;
         }else if(Ks_norm > 0 && Kd_norm > 0){
             mtl->material_type = mtl->GLOSSY; // Diffuse and Specular
             mtl->diffuse = Kd_norm / Ks_norm;
         }else{
-            mtl->diffuse = 0;
+            mtl->diffuse = 1;
         }
         // printf("%s %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", material.first.c_str(), mtl->Kd[0], mtl->Kd[1], mtl->Kd[2], mtl->Ks[0],mtl->Ks[1],mtl->Ks[2], mtl->Ka[0], mtl->Ka[1], mtl->Ka[2]);
     }
