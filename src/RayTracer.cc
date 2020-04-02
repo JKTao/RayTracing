@@ -52,21 +52,6 @@ Ray RayTracer::specular_sample(Eigen::Vector3d & z_axis, Eigen::Vector3d & posit
     Eigen::Matrix3d axis;
     axis << x_axis, y_axis, z_axis;
     Eigen::Vector3d direction = axis * diff_direction;
-    // cerr << diff_direction[0] << " " << diff_direction[1] << " " << diff_direction[2] << endl;
-    // cerr << diff_direction.norm() << endl;
-    // cerr << sin_theta << endl;
-    // cerr << axis << endl;
-    // cerr << Ns << endl;
-    // cerr << direction << endl;
-    // cerr << direction.norm() << endl;
-    // exit(1);
-    // if(logging == 2){
-    //     cout << "    DIFF_DIRECTION " <<  diff_direction[0] << " " <<  diff_direction[1] << " " << diff_direction[2] << endl;
-    //     cout << "    DIRECTION " <<  direction[0] << " " <<  direction[1] << " " << direction[2] << endl;
-    //     cout << "    DIRECTION_NORM " <<  direction.norm() << endl;
-    //     cout << "    COS_THETA " << z_axis.dot(direction) << endl;
-    //     cout << "    XAXIS ZAXIS " << z_axis.dot(x_axis) << endl;
-    // }
     return Ray(position, direction, Ray::SPECULAR);
 }
 
@@ -140,57 +125,26 @@ Ray RayTracer::next_ray_sample(Ray & ray, Intersection & intersection){
 
 Eigen::Vector3d RayTracer::ray_tracing(Ray & ray, int depth){
     Intersection intersection;
-    if(logging == 2){
-        cout << "DEPTH " << depth << endl;
-        cout << "  RAY_ORIGIN " << ray.origin[0] << " " << ray.origin[1] << " " << ray.origin[2] << endl;
-        cout << "  RAY_DIRECTION " << ray.direction[0] << " " << ray.direction[1] << " " << ray.direction[2] << endl;
-    }
     if(!scene->find_intersection(ray, intersection)){
-        if(logging == 2){
-            cout << "  No intersection" << endl;
-        }
         return Eigen::Vector3d(0, 0, 0); //background color black
     }
     if(depth > max_depth){
-        if(logging == 2){
-            cout << "  MTL Ka: " << intersection.object->mtl->Ka[0] << endl;
-            cout << "  MTL Kd: " << intersection.object->mtl->Kd[0] << endl;
-            cout << "  INTERSECTION: " << intersection.position[0] << " " << intersection.position[1] << " " << intersection.position[2] << endl;
-        }
         return intersection.object->mtl->Ka;
     }
     Ray next_ray = next_ray_sample(ray, intersection);
     Eigen::Vector3d color = ray_tracing(next_ray, depth + 1);
-    if(logging == 1 && depth < 5){
-        cout << "color" << " " << color[0] << " " << color[1] << " " << color[2]<< endl;
-    }
-    if(logging == 2){
-        cout << "  INDIRECT_COLOR: " << color[0] << " " << color[1] << " " << color[2] << endl;
-    }
     if(next_ray.ray_type == next_ray.DIFFUSE){
         // diffuse case
-        if(logging == 1 && depth < 5){
-            cout << "Kd " << intersection.object->mtl->Kd[0] << " " << intersection.object->mtl->Kd[1] << " "  << intersection.object->mtl->Kd[2] << endl;
-        }
         color =  2 * intersection.object->mtl->Kd.cwiseProduct(color);
     }else if(next_ray.ray_type == next_ray.SPECULAR){
         // specular case
-        if(logging == 1 && depth < 5){
-            cout << "Ks " << intersection.object->mtl->Ks[0] << " " << intersection.object->mtl->Ks[1] << " "  << intersection.object->mtl->Ks[2] << endl;
-        }
         color = intersection.object->mtl->Ks.cwiseProduct(color);
     }else if(next_ray.ray_type == next_ray.REFRACT){
         // refract case
-        if(logging == 1 && depth < 5){
-            cout << "Tf " << intersection.object->mtl->Tf[0] << " " << intersection.object->mtl->Tf[1]  << " " << intersection.object->mtl->Tf[2] << endl;
-        }
         color = intersection.object->mtl->Tf.cwiseProduct(color);
     }else{
         cerr << "bad things happened!" << endl;
         exit(1);
-    }
-    if(logging == 1 && depth < 5){
-        cout << "Ka " << intersection.object->mtl->Ka[0] << " " << intersection.object->mtl->Ka[1] << " "  << intersection.object->mtl->Ka[2] << endl;
     }
     return intersection.object->mtl->Ka + color;
 }

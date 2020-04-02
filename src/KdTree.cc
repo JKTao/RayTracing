@@ -73,47 +73,8 @@ Object* KdTree::build_kdtree(vector<Object*> & objects){
         nth_element(objects.begin(), objects.begin() + position, objects.end(), less_than_for_object); // this is not a good idea in some special case.
         vector<Object*> left_objects(objects.begin(), objects.begin() + position);
         vector<Object*> right_objects(objects.begin() + position, objects.end());
-        // double middle = boundingbox_union.center_node[index];
-        // int flag = -1;
-        // for(auto object:objects){
-        //     double curr = object->get_boundingbox().center_node[index];
-        //     if(curr < middle){
-        //         left_objects.push_back(object);
-        //     }else if(curr > middle){
-        //         right_objects.push_back(object);
-        //     }else{
-        //         middle_objects.push_back(object);
-        //     }
-        // }
-
-        //         //In this case, which seems badly for us, the stragety degenerate. but division is still neccessary to guranttee terminal of recursion.
-        //         //A flag is set to assign object at cut point to both side equaprobaly.
-        //         if(left_objects.empty()){
-        //             left_objects.push_back(object);
-        //             flag = 0;
-        //         }else{
-        //             right_objects.push_back(object);
-        //             flag = 1;
-        //         }
-        //     }else if(flag == 0){
-        //         right_objects.push_back(object);
-        //         flag = 1;
-        //     }else{
-        //         left_objects.push_back(object);
-        //         flag = 0;
-        //     }
-        // }
         if(left_objects.empty() || right_objects.empty()){
             cerr << "strange error happens!" << endl;
-            // string  empty_message = (left_objects.empty())?"left":"right";
-            // cerr << empty_message << endl;
-            // cout << boundingbox_union.first_node[0] << " " << boundingbox_union.first_node[1] << " " <<  boundingbox_union.first_node[2] << " " << boundingbox_union.second_node[0] << " " << boundingbox_union.second_node[1] << " " <<  boundingbox_union.second_node[2] << endl;
-            // cout << index << " " << " " << " " << objects.size() << endl;
-            // for(auto object:objects){
-            //     auto boundingbox_ = object->get_boundingbox();
-            //     cout << boundingbox_.center_node[index] << "    ";
-            //     cout << boundingbox_.first_node[0] << " " << boundingbox_.first_node[1] << " " <<  boundingbox_.first_node[2] << " " << boundingbox_.second_node[0] << " " << boundingbox_.second_node[1] << " " <<  boundingbox_.second_node[2] << endl;
-            // }
             exit(1);
         }
         left = KdTree::build_kdtree(left_objects);
