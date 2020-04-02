@@ -35,6 +35,9 @@ void Model::read_config(const char *config_file_path){
     YAML::Node config = YAML::LoadFile(config_file_path);
     object_file_path = config["object_file_path"].as<string>();
     material_lib_path = config["material_lib_path"].as<string>();
+    save_image_path = config["save_image_path"].as<string>();
+    iteration_times = config["max_iteration"].as<int>();
+    max_depth = config["max_depth"].as<int>();
     fov = config["fov"].as<double>();
     width = config["width"].as<int>();
     height = config["height"].as<int>();
@@ -57,7 +60,9 @@ void Model::read_object_file(const char *object_file_path){
         cerr << "Unable to open object file . " << object_file_path << endl;
         exit(1);
     }
+    int line_count = 0;
     while(fscanf(object_file, "%[^\n]\n", buffer) != -1){
+        line_count++;
         if(starts_with(buffer, "mtllib")){
             mtllib_name = move(string(buffer + 7));
         }else if(starts_with(buffer, "usemtl")){
@@ -97,19 +102,27 @@ void Model::read_object_file(const char *object_file_path){
                 sscanf(buffer + 1, "%d %d %d %d %d %d", &v1, &vn1, &v2, &vn2, &v3, &vn3);
                 Triangle *triangle = new Triangle(vertices[v1 - 1], vertices[v2 - 1], vertices[v3 - 1], normals[vn1 - 1], normals[vn2 - 1], normals[vn3 - 1], mtl);
                 triangles.push_back(triangle);
-                printf("%d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3);
+                if(line_count > 14030){
+                    printf("%d %d %d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3, v4, vn4);
+                }
+                // printf("%d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3);
             }else if(number == 4){
                 // break the quadrilateral into triangles
+              
                 sscanf(buffer + 1, "%d %d %d %d %d %d %d %d", &v1, &vn1, &v2, &vn2, &v3, &vn3, &v4, &vn4);
+                if(line_count > 13990){
+                    printf("%d %d %d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3, v4, vn4);
+                }
                 Triangle *triangle1 = new Triangle(vertices[v1 - 1], vertices[v2 - 1], vertices[v3 - 1], normals[vn1 - 1], normals[vn2 - 1], normals[vn3 - 1], mtl);
                 Triangle *triangle2 = new Triangle(vertices[v1 - 1], vertices[v3 - 1], vertices[v4 - 1], normals[vn1 - 1], normals[vn3 - 1], normals[vn4 - 1], mtl);
                 triangles.push_back(triangle1);
                 triangles.push_back(triangle2);
-                printf("%d %d %d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3, v4, vn4);
+                // printf("%d %d %d %d %d %d %d %d\n", v1, vn1, v2, vn2, v3, vn3, v4, vn4);
             }
             // deal with face
         }
     }
+    cout << "LINE COUNT " << line_count << endl;
 }
 
 void Model::read_material_lib(const char *material_lib_path){
@@ -146,9 +159,26 @@ void Model::read_material_lib(const char *material_lib_path){
         }else if(starts_with(buffer, "Ns")){
             sscanf(buffer + 3, "%lf", &e);
             mtl->Ns = e;
-        }else if(starts_with(buffer, "Ni")){
-            sscanf(buffer + 3, "%lf", &e);
-            mtl->Ni = e;
         }
+    }
+    for(auto &material:material_table){
+        Material *mtl = material.second;
+        double Kd_norm = mtl->Kd.norm();
+        double Ks_norm = mtl->Ks.norm();
+        double Ka_norm = mtl->Ka.norm();
+        if(mtl->Ni > 1){
+            mtl->material_type = mtl->TRANSPARENT;
+        }else if(Ka_norm > 0){
+            mtl->material_type = mtl->LIGHT;
+        }
+        if(Ks_norm == 0){
+            mtl->diffuse = 1;
+        }else if(Ks_norm > 0 && Kd_norm > 0){
+            mtl->material_type = mtl->GLOSSY; // Diffuse and Specular
+            mtl->diffuse = Kd_norm / Ks_norm;
+        }else{
+            mtl->diffuse = 0;
+        }
+        // printf("%s %lf %lf %lf %lf %lf %lf %lf %lf %lf\n", material.first.c_str(), mtl->Kd[0], mtl->Kd[1], mtl->Kd[2], mtl->Ks[0],mtl->Ks[1],mtl->Ks[2], mtl->Ka[0], mtl->Ka[1], mtl->Ka[2]);
     }
 }

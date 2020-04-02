@@ -2,6 +2,13 @@
 #include <string>
 #include <chrono>
 
+Random::Random():uniform_double(0, 1){
+}
+
+double Random::double_rand(){
+    return uniform_double(engine);
+}
+
 TicToc::TicToc() {   
     tic();
 }   

@@ -4,10 +4,15 @@
 #include <iostream>
 
 using Eigen::Vector3d;
+using namespace std;
 Ray::Ray(){
 }
 
 Ray::Ray(const Vector3d &origin, const Vector3d & direction):origin(origin), direction(direction){
+    inv_direction = direction.cwiseInverse();
+}
+
+Ray::Ray(const Vector3d &origin, const Vector3d & direction, int ray_type):origin(origin), direction(direction), ray_type(ray_type){
     inv_direction = direction.cwiseInverse();
 }
 
@@ -19,27 +24,17 @@ Intersection::Intersection(Triangle *object, const Eigen::Vector3d & normal, con
     // std::cout << "intersection " << normal[0] << normal[1] << normal[2] << std::endl;
 }
 
-Ray Intersection::caculate_reflect_ray(const Ray & ray){
-    double projection_into_normal = ray.direction.dot(normal);//How to caculate normal in other 3d shape?
-    into = (projection_into_normal < 0)?1:-1;
-    n = (into == 1)?n:1/n; // reflection rate
-    cos_alpha = projection_into_normal * into; // define cos_alpha and sin_alpha as member variable to avoid recaculate in refract ray 
-    //TODO: sqrt may be bottleneck?
-    sin_alpha = sqrt(1 - cos_alpha * 2);
-    Eigen::Vector3d origin = position;
-    Eigen::Vector3d direction = ray.direction + 2 * cos_alpha * normal;
-    return Ray(origin, direction);
+Eigen::Vector3d Ray::caculate_reflect_direction(Eigen::Vector3d normal, double cos_alpha){
+    Eigen::Vector3d direction = this->direction + 2 * cos_alpha * normal;
+    return direction;
 }
 
-std::optional<Ray> Intersection::caculate_refract_ray(const Ray & ray){
-    sin_theta = sin_alpha/n;
-    if(sin_theta >= 1){
-        return std::nullopt;
-    }else{
-        double tan_theta = sin_theta / sqrt(1 - sin_theta * sin_theta);
-        //TODO: sqrt may be bottleneck?
-        Eigen::Vector3d origin = position;
-        Eigen::Vector3d direction = (ray.direction + cos_alpha * normal).normalized() * tan_theta - normal * into;
-        return Ray(origin, direction);
+Ray Ray::caculate_refract_ray(Eigen::Vector3d position, Eigen::Vector3d normal, double relative_n, double cos_alpha){
+    double cos_beta = 1 - relative_n * relative_n * (1 - cos_alpha * cos_alpha);
+    if(cos_beta < 0){
+        return Ray(position, position, -1);
     }
+    cos_beta = sqrt(cos_beta);
+    Eigen::Vector3d new_direction = relative_n * direction + (relative_n * cos_alpha - cos_beta) * normal;
+    return Ray(position, new_direction, Ray::REFRACT);
 }

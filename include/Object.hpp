@@ -1,17 +1,24 @@
 #pragma once
 #include "Ray.hpp"
 #include <Eigen/Core>
-#include <optional>
 class Intersection;
 class Ray;
 class AABB;
 
 struct Material{
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    enum MATERIAL_TYPE{
+        TRANSPARENT,
+        LIGHT,
+        DIFFUSE,
+        GLOSSY
+    };
     Eigen::Vector3d Kd{0, 0, 0};
     Eigen::Vector3d Ka{0, 0, 0};
     Eigen::Vector3d Ks{0, 0, 0};
     Eigen::Vector3d Tf{0, 0, 0};
+    double diffuse = 0;
+    int material_type;
     double Ni = 1;
     double Ns = 60;
 };

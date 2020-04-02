@@ -1,5 +1,6 @@
 #pragma once
 #include "Ray.hpp"
+#include "Ultility.hpp"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -11,6 +12,7 @@ public:
     Eigen::Vector3d front;
     Eigen::Vector3d right;
     Eigen::Vector3d up;
+    Random rand_generator;
     int width;
     int height;
     double scale_x;

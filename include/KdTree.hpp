@@ -1,5 +1,6 @@
 #pragma once
 #include <Object.hpp>
+#include <vector>
 
 class KdTree;
 class KdTree:public Object{

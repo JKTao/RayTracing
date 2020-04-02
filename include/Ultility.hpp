@@ -1,5 +1,14 @@
 #pragma once
 #include <chrono>
+#include <random>
+
+class Random{
+public:
+    std::uniform_real_distribution<double> uniform_double;
+    std::default_random_engine engine;
+    Random();
+    double double_rand();
+};
 
 class TicToc
 {

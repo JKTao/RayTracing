@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <map>
+#include <vector>
 #include <Ray.hpp>
 #include <Object.hpp>
 #include <Eigen/Core>
@@ -13,6 +14,9 @@ public:
     std::vector<Object*> triangles;
     std::string object_file_path;
     std::string material_lib_path;
+    std::string save_image_path;
+    int iteration_times;
+    int max_depth;
     Eigen::Vector3d eye;
     Eigen::Vector3d up;
     Eigen::Vector3d lookat;

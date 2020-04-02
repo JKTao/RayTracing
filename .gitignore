@@ -3,4 +3,5 @@ build/
 .idea/
 cmake-build-debug/
 models/
+images/
 config/

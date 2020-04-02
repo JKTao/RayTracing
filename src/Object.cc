@@ -39,15 +39,15 @@ bool Triangle::find_intersection(const Ray & ray, Intersection &intersection){
     Eigen::Vector3d P = ray.direction.cross(edges.col(2));
     Eigen::Vector3d Q = T.cross(edges.col(1));
     double b = P.dot(edges.col(1));
-    if(b > 1e-10 || b < -1e-10){
+    if(b > 1e-15 || b < -1e-15){
         double b_inv = 1/b;
         double t = Q.dot(edges.col(2)) * b_inv;
-        if(t < 0 || t > intersection.t){
+        if(t < 1e-8 || t > intersection.t){
             return false;
         }
         double u = P.dot(T) * b_inv;
         double v = Q.dot(ray.direction) * b_inv;
-        if(0 < u  && 0 < v && u + v < 1){
+        if(0 <= u  && 0 <= v && u + v <= 1){
             double w = 1 - u - v;
             Eigen::Vector3d normal = (normals.col(0) * w + normals.col(1) * u + normals.col(2) * v).normalized();
             Eigen::Vector3d position = ray.direction * t + ray.origin;
