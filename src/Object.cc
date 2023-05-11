@@ -72,13 +72,18 @@ AABB AABB::get_boundingbox(){
 
 bool AABB::find_intersection(const Ray & ray, Intersection &intersection){
     // bouding box intersection!
-    Eigen::Matrix<double, 3, 2> t;
-    t.col(0) = (first_node - ray.origin).cwiseProduct(ray.inv_direction);
-    t.col(1) = (second_node - ray.origin).cwiseProduct(ray.inv_direction);
-    Eigen::Vector3d t1 = t.rowwise().minCoeff();
-    Eigen::Vector3d t2 = t.rowwise().maxCoeff();
-    double t_near = t1.maxCoeff();
-    double t_far = t2.minCoeff();
+    // Eigen::Matrix<double, 3, 2> t;
+    Eigen::Vector3d t1 = (first_node - ray.origin).cwiseProduct(ray.inv_direction);
+    Eigen::Vector3d t2 = (second_node - ray.origin).cwiseProduct(ray.inv_direction);
+    Eigen::Vector3d t3 = t1.cwiseMin(t2);
+    Eigen::Vector3d t4 = t2.cwiseMax(t1);
+    double t_near = t3.maxCoeff();
+    double t_far = t4.minCoeff();
+    // Eigen::Vector3d t3 = t1;
+    // t1 = t1.cwiseMin(t2);
+    // t2 = t2.cwiseMax(t3);
+    // double t_near = t1.maxCoeff();
+    // double t_far = t2.minCoeff();
     // cout << t_near << t_far << endl;
     // cout << ray.direction[0] << " " << ray.direction[1] << " " << ray.direction[2] << endl;
     // cout << first_node[0] << " " << first_node[1] << " " << first_node[2] << endl;
